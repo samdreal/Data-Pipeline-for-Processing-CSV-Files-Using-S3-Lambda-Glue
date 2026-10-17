@@ -38,23 +38,18 @@ This project implements an **end-to-end data pipeline** for processing CSV files
 
 ## 🏗️ Architecture
 
-```mermaid
-flowchart LR
-    U([👤 User]) -->|Upload CSV| RAW[(🪣 S3<br/>csv-raw-data)]
-    RAW -->|S3 PUT event| L[⚡ AWS Lambda<br/>Preprocessing]
-    L -->|Cleaned CSV| PROC[(🪣 S3<br/>csv-processed-data)]
-    PROC --> C1[🕷️ Glue Crawler]
-    C1 --> CAT[(📚 Glue<br/>Data Catalog)]
-    PROC --> ETL[⚙️ Glue ETL Job<br/>Transform & Aggregate]
-    ETL --> FINAL[(🪣 S3<br/>final-csv-data)]
-    FINAL --> C2[🕷️ Glue Crawler]
-    C2 --> CAT
-    CAT --> QS[📈 Amazon QuickSight<br/>Dashboards]
-```
+<p align="center">
+  <img src="images/architecture.svg" alt="Architecture diagram: S3 → Lambda → S3 → Glue ETL → S3 → QuickSight, with Glue Crawlers and Data Catalog" width="100%"/>
+</p>
 
-<!-- Optional: add your own architecture image here
-<p align="center"><img src="images/architecture.png" alt="Architecture diagram" width="800"/></p>
--->
+| Step | What happens |
+|:----:|--------------|
+| **1** | A CSV file is uploaded to the `csv-raw-data` bucket |
+| **2** | The S3 event triggers **AWS Lambda**, which cleans the data and writes it to `csv-processed-data` |
+| **3** | A **Glue Crawler** catalogs the processed data in the **Glue Data Catalog** |
+| **4** | A **Glue ETL job** transforms the data and writes it to `final-csv-data` |
+| **5** | A second **Glue Crawler** updates the catalog with the final schema |
+| **6** | **Amazon QuickSight** queries the final data through the Data Catalog for dashboards |
 
 ---
 
@@ -118,6 +113,7 @@ flowchart LR
  ┃ ┗ 📄 template.yaml                    #   ↳ AWS SAM / CloudFormation template
  ┣ 📊 weather_data.csv                   # Sample raw input (hourly weather data)
  ┣ 📊 run-1792270295351-part-r-00000.csv # Sample final output from the Glue ETL job
+ ┣ 🖼️ images/architecture.svg          # Architecture diagram
  ┣ 🧾 manifest.json                      # QuickSight S3 manifest pointing to the final data
  ┗ 📘 README.md
 ```
