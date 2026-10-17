@@ -1,0 +1,9 @@
+{
+  "fileLocations": [
+    {
+      "URIs": [
+        "s3://final-csv-data-tye/run-1792270295351-part-r-00000.csv"
+      ]
+    }
+  ]
+}
